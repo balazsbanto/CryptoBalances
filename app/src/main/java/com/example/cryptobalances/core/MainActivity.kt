@@ -35,4 +35,10 @@ class MainActivity : AppCompatActivity(), KoinComponent{
         }
     }
 
+    override fun onBackPressed() {
+        if (!router.handleBack()) {
+            super.onBackPressed()
+        }
+    }
+
 }

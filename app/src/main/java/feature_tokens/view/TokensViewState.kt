@@ -1,4 +1,5 @@
 package feature_tokens.view
 
-class TokensViewState {
+sealed class TokensViewState {
+    class EmtpyState() : TokensViewState()
 }
