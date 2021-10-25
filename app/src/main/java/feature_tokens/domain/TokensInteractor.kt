@@ -69,8 +69,9 @@ class TokensInteractor(private val networkService: NetworkService, private val c
             }
             .toList()
             .flatMapObservable {
-                Observable.just(TokensViewState.MatchedTokensState(it))
+                Observable.just(TokensViewState.MatchedTokensState(it) as TokensViewState)
             }
+            .startWith(TokensViewState.LoadingState())
     }
 
     private fun getTokenByName(tokenName: String): Single<ERC20Token> {

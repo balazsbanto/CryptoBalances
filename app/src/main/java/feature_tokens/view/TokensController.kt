@@ -48,10 +48,16 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
         when (viewState) {
             is TokensViewState.InitialState -> renderInitialState()
             is TokensViewState.MatchedTokensState -> renderTokenList(viewState)
+            is TokensViewState.LoadingState -> renderLoadingState()
         }
     }
 
+    private fun renderLoadingState() {
+        binding.loadingIndicator.root.show()
+    }
+
     private fun renderTokenList(viewState: TokensViewState.MatchedTokensState) {
+        binding.loadingIndicator.root.remove()
         binding.initialStateLabel.remove()
         binding.tokenList.show()
 
@@ -62,6 +68,7 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     private fun renderInitialState() {
         Timber.d("Rendered initial state")
         binding.tokenList.remove()
+        binding.loadingIndicator.root.remove()
         binding.initialStateLabel.show()
         binding.initialStateLabel.text = "Search for a token"
     }

@@ -18,6 +18,7 @@ class TokensPresenter(
             .doOnNext { Timber.d("Intent: searchIntent") }
             .switchMap { interactor.searchIntent(it) }
 
+
         val viewState: Observable<TokensViewState> = Observable.merge(
             arrayListOf(
                 initializeEmptyStateIntent,

@@ -45,4 +45,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/token_search_box" />
 
+    <include
+        android:id="@+id/loading_indicator"
+        layout="@layout/progress_bar_sticky" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
