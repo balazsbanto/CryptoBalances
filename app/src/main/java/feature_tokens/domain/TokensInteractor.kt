@@ -63,15 +63,21 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         }
         val matchedTokenNames = getMatchedTokenNames(searchStr)
 
-        if (matchedTokenNames.isEmpty()) {
-            return Observable.just(TokensViewState.NoTokenFoundState())
+        return if (matchedTokenNames.isEmpty()) {
+            Observable.just(TokensViewState.NoTokenFoundState())
+        } else {
+            getMatchedTokens(matchedTokenNames)
         }
+    }
 
+    private fun getMatchedTokens(matchedTokenNames:List<String>): Observable<TokensViewState> {
         val singles = mutableListOf<Single<ERC20Token>>()
         matchedTokenNames.forEach { tokenName->
             singles.add(getTokenByName(tokenName))
         }
 
+        // Lehet hogy inkabb itt kellene az atalakitast megcsinaljam es megallaitsam ha error van?
+        // Mindenkepp meg kellene nezzem az error codot.
         return Observable.fromIterable(singles)
             .flatMap {
                 it.observeOn(Schedulers.computation()).toObservable()
