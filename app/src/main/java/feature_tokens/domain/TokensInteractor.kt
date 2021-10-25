@@ -9,31 +9,47 @@ import feature_tokens.view.TokensViewState
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
+import org.json.JSONArray
 import org.json.JSONObject
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 
-class TokensInteractor(private val networkService: NetworkService, private val context:Context) {
+class TokensInteractor(private val networkService: NetworkService, private val context: Context) {
+    private val tokenNameToAddressMap: Map<String, String>
+
+    init {
+        tokenNameToAddressMap = readTokenMap()
+    }
 
     val tokenSubject: PublishSubject<TokensViewState.MatchedToken> = PublishSubject.create()
 
-
-    fun initEmptyState(): Observable<TokensViewState> {
+    private fun readTokenMap(): Map<String, String> {
         val jsonContent = context.resources.openRawResource(R.raw.available_tokens)
             .bufferedReader().use { it.readText() }
 
-        val answer = JSONObject(jsonContent)
+        val tokenNameToAddressMap = hashMapOf<String, String>()
+        val jsonObject = JSONObject(jsonContent)
+        val tokenArray = jsonObject["tokens"] as JSONArray
+        for (i in 0 until tokenArray.length()) {
+            val item = tokenArray.getJSONObject(i)
+            val name = item["name"] as String
+            val address = item["address"] as String
+            tokenNameToAddressMap[name] = address
+        }
+
+        return tokenNameToAddressMap
+    }
+
+    fun initEmptyState(): Observable<TokensViewState> {
+//        val t2 = t["address"]
         return Observable.just(TokensViewState.EmtpyState())
     }
 
-    fun searchIntent(searchStr:String) :Observable<TokensViewState>{
+    fun searchIntent(searchStr: String): Observable<TokensViewState> {
 
         return Observable.just(TokensViewState.EmtpyState())
     }
 
-    fun getTokenByName(tokenName:String) {
+    fun getTokenByName(tokenName: String) {
         networkService.getERC20Tokens(
             module = ConstData.ACCOUNT,
             action = ConstData.TOKEN_BALANCE,
@@ -44,7 +60,7 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         )
 //            .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe { token: ERC20Token?, error:Throwable? ->
+            .subscribe { token: ERC20Token?, error: Throwable? ->
                 if (error == null) {
                     Timber.d(token.toString())
                 } else {
