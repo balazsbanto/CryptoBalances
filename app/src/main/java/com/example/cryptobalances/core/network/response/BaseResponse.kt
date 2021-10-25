@@ -1,4 +1,4 @@
-package com.example.cryptobalances.core.response
+package com.example.cryptobalances.core.network.response
 
 open class BaseResponse {
 

@@ -1,7 +1,6 @@
-package feature_tokens.domain
+package com.example.cryptobalances.core.network
 
-import com.example.cryptobalances.core.response.ERC20Token
-import io.reactivex.Observable
+import com.example.cryptobalances.core.network.response.ERC20Token
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query

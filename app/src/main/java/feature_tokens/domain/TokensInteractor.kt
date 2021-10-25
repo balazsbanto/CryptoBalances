@@ -1,12 +1,10 @@
 package feature_tokens.domain
 
-import android.util.Log
-import com.example.cryptobalances.core.response.ERC20Token
+import com.example.cryptobalances.core.network.DataService
+import com.example.cryptobalances.core.network.response.ERC20Token
 import com.example.cryptobalances.core.utils.ConstData
 import feature_tokens.view.TokensViewState
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
