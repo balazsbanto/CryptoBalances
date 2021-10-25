@@ -6,31 +6,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <EditText
+        android:layout_marginTop="30dp"
+        android:id="@+id/token_search_box"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:hint="Search for an ERC20 token"
+        android:textColor="@color/black"
+        android:textColorHint="#808080"
+        android:inputType="text"/>
+
     <TextView
-        android:id="@+id/token_items"
+        android:id="@+id/token_search_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
-        android:text="ETH, BITCOIN, STUFF"
+        android:text=""
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:textStyle="normal|bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <Button
-        android:id="@+id/get_tokens_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/holo_orange_light"
-        android:text="GET"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:layout_marginTop="70dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/token_items" />
+        app:layout_constraintTop_toBottomOf="@+id/token_search_box" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

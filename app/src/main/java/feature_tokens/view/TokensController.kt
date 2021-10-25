@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import com.example.cryptobalances.core.Navigator
 import com.example.cryptobalances.databinding.ControllerTokensScreenBinding
 import com.hannesdorfmann.mosby3.MviController
+import com.jakewharton.rxbinding3.widget.textChanges
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.koin.core.get
 import org.koin.core.inject
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class TokensController: MviController<TokensView, TokensPresenter>(), TokensView {
 
@@ -21,13 +23,10 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     private val navigator: Navigator by inject()
     private lateinit var binding:ControllerTokensScreenBinding
     private val getTokenByNameSubject = PublishSubject.create<String>()
-    private val initializeSubject = PublishSubject.create<Any>()
+//    private val initializeSubject = PublishSubject.create<Any>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         binding = ControllerTokensScreenBinding.inflate(inflater, container, false)
-        binding.getTokensButton.setOnClickListener {
-            getTokenByNameSubject.onNext("USD")
-        }
         return binding.root
 
     }
@@ -48,6 +47,7 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
 
     private fun renderEmtpyState() {
         Timber.d("Rendered empty state")
+        binding.tokenSearchHint.text = "Search token"
     }
 
     override fun handleBack(): Boolean {
@@ -56,9 +56,16 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
         return super.handleBack()
     }
 
-    override fun initializeEmptyState(): Observable<Any> = Observable.just(Any())
-    override fun getTokensByName(): Observable<String> = getTokenByNameSubject
-    override fun initialize(): Observable<Any> {
+    override fun searchIntent(): Observable<String> {
+//        binding.cattleHeaderSearchText.clearFocus()
+//        binding.focusableItem.requestFocus()
+        return binding.tokenSearchBox
+            .textChanges().debounce(500, TimeUnit.MILLISECONDS)
+            .map { it.toString() }
+    }
+
+    override fun initializeEmptyStateIntent(): Observable<Any> {
         return Observable.just(Any())
     }
+    override fun getTokensByName(): Observable<String> = getTokenByNameSubject
 }

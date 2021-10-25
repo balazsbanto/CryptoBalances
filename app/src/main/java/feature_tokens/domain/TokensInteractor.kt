@@ -1,25 +1,39 @@
 package feature_tokens.domain
 
+import android.content.Context
+import com.example.cryptobalances.R
 import com.example.cryptobalances.core.network.NetworkService
 import com.example.cryptobalances.core.network.response.ERC20Token
 import com.example.cryptobalances.core.utils.ConstData
 import feature_tokens.view.TokensViewState
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 
-class TokensInteractor(private val networkService: NetworkService) {
+class TokensInteractor(private val networkService: NetworkService, private val context:Context) {
 
-//    private var requestInterface: NetworkService = Retrofit.Builder()
-//        .baseUrl(ConstData.BASE_URL)
-//        .addConverterFactory(GsonConverterFactory.create())
-//        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-//        .build().create(NetworkService::class.java)
+    val tokenSubject: PublishSubject<TokensViewState.MatchedToken> = PublishSubject.create()
+
 
     fun initEmptyState(): Observable<TokensViewState> {
+        val jsonContent = context.resources.openRawResource(R.raw.available_tokens)
+            .bufferedReader().use { it.readText() }
+
+        val answer = JSONObject(jsonContent)
+        return Observable.just(TokensViewState.EmtpyState())
+    }
+
+    fun searchIntent(searchStr:String) :Observable<TokensViewState>{
+
+        return Observable.just(TokensViewState.EmtpyState())
+    }
+
+    fun getTokenByName(tokenName:String) {
         networkService.getERC20Tokens(
             module = ConstData.ACCOUNT,
             action = ConstData.TOKEN_BALANCE,
@@ -37,7 +51,5 @@ class TokensInteractor(private val networkService: NetworkService) {
                     Timber.d(error.message)
                 }
             }
-
-        return Observable.just(TokensViewState.EmtpyState())
     }
 }

@@ -1,9 +1,6 @@
 package feature_tokens.view
 
 import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
-import feature.info_screen.domain.InfoScreenInteractor
-import feature.info_screen.view.InfoScreenView
-import feature.info_screen.view.InfoScreenViewState
 import feature_tokens.domain.TokensInteractor
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -13,9 +10,13 @@ class TokensPresenter(
     private val interactor: TokensInteractor
 ) : MviBasePresenter<TokensView, TokensViewState>() {
     override fun bindIntents() {
-        val initializeEmptyStateIntent = intent(TokensView::initializeEmptyState)
+        val initializeEmptyStateIntent = intent(TokensView::initializeEmptyStateIntent)
             .doOnNext { Timber.d("Intent: initializeEmptyState") }
             .switchMap { interactor.initEmptyState() }
+
+        val searchIntent = intent(TokensView::searchIntent)
+            .doOnNext { Timber.d("Intent: searchIntent") }
+            .switchMap { interactor.searchIntent(it) }
 
         val viewState: Observable<TokensViewState> = Observable.merge(
             arrayListOf(

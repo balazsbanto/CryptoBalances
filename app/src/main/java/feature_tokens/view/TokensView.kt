@@ -6,8 +6,8 @@ import org.koin.core.KoinComponent
 
 interface TokensView : MvpView, KoinComponent {
 
-    fun initializeEmptyState() : Observable<Any>
+    fun initializeEmptyStateIntent() : Observable<Any>
     fun getTokensByName() : Observable<String>
-    fun initialize(): Observable<Any>
+    fun searchIntent():Observable<String>
     fun render(viewState: TokensViewState)
 }
