@@ -15,9 +15,11 @@ import timber.log.Timber
 
 class TokensInteractor(private val networkService: NetworkService, private val context: Context) {
     private val tokenNameToAddressMap: Map<String, String>
+    private val availableTokenNames: List<String>
 
     init {
         tokenNameToAddressMap = readTokenMap()
+        availableTokenNames = tokenNameToAddressMap.keys.toList()
     }
 
     val tokenSubject: PublishSubject<TokensViewState.MatchedToken> = PublishSubject.create()
@@ -31,7 +33,7 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         val tokenArray = jsonObject["tokens"] as JSONArray
         for (i in 0 until tokenArray.length()) {
             val item = tokenArray.getJSONObject(i)
-            val name = item["name"] as String
+            val name = item["symbol"] as String
             val address = item["address"] as String
             tokenNameToAddressMap[name] = address
         }
@@ -39,13 +41,25 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         return tokenNameToAddressMap
     }
 
+    fun getMatchedTokenNames(searchedToken:String) : List<String> {
+
+        val pattern = searchedToken.toRegex()
+        val matchedTokenNames = mutableListOf<String>()
+        availableTokenNames.forEach { tokenName ->
+            if (pattern.containsMatchIn(tokenName)) {
+                matchedTokenNames.add(tokenName)
+            }
+        }
+
+        return matchedTokenNames
+    }
+
     fun initEmptyState(): Observable<TokensViewState> {
-//        val t2 = t["address"]
         return Observable.just(TokensViewState.EmtpyState())
     }
 
     fun searchIntent(searchStr: String): Observable<TokensViewState> {
-
+        val match = getMatchedTokenNames("USD")
         return Observable.just(TokensViewState.EmtpyState())
     }
 

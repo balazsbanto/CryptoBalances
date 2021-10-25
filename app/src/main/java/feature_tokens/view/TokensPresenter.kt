@@ -20,7 +20,8 @@ class TokensPresenter(
 
         val viewState: Observable<TokensViewState> = Observable.merge(
             arrayListOf(
-                initializeEmptyStateIntent
+                initializeEmptyStateIntent,
+                searchIntent
             )
         )
             .doOnNext {
