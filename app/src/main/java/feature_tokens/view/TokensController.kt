@@ -49,7 +49,14 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
             is TokensViewState.InitialState -> renderInitialState()
             is TokensViewState.MatchedTokensState -> renderTokenList(viewState)
             is TokensViewState.LoadingState -> renderLoadingState()
+            is TokensViewState.ErrorState -> renderErrorState(viewState)
         }
+    }
+
+    private fun renderErrorState(viewState: TokensViewState.ErrorState) {
+        binding.loadingIndicator.root.remove()
+        binding.infoLabel.show()
+        binding.infoLabel.text = "Unexpected error: ${viewState.message}"
     }
 
     private fun renderLoadingState() {
@@ -58,7 +65,7 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
 
     private fun renderTokenList(viewState: TokensViewState.MatchedTokensState) {
         binding.loadingIndicator.root.remove()
-        binding.initialStateLabel.remove()
+        binding.infoLabel.remove()
         binding.tokenList.show()
 
         tokenListAdapter = TokenListAdapter(ArrayList(viewState.tokenList))
@@ -69,8 +76,8 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
         Timber.d("Rendered initial state")
         binding.tokenList.remove()
         binding.loadingIndicator.root.remove()
-        binding.initialStateLabel.show()
-        binding.initialStateLabel.text = "Search for a token"
+        binding.infoLabel.show()
+        binding.infoLabel.text = "Search for a token"
     }
 
     override fun handleBack(): Boolean {

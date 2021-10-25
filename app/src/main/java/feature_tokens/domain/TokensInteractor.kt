@@ -72,6 +72,8 @@ class TokensInteractor(private val networkService: NetworkService, private val c
                 Observable.just(TokensViewState.MatchedTokensState(it) as TokensViewState)
             }
             .startWith(TokensViewState.LoadingState())
+            .onErrorReturn {
+                TokensViewState.ErrorState(it.message) }
     }
 
     private fun getTokenByName(tokenName: String): Single<ERC20Token> {
