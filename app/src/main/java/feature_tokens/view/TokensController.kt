@@ -11,6 +11,7 @@ import com.example.cryptobalances.core.utils.show
 import com.example.cryptobalances.databinding.ControllerTokensScreenBinding
 import com.hannesdorfmann.mosby3.MviController
 import com.jakewharton.rxbinding3.widget.textChanges
+import feature_tokens.domain.ERC20Token
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.koin.core.get
@@ -50,7 +51,17 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
             is TokensViewState.MatchedTokensState -> renderTokenList(viewState)
             is TokensViewState.LoadingState -> renderLoadingState()
             is TokensViewState.ErrorState -> renderErrorState(viewState)
+            is TokensViewState.NoTokenFoundState -> renderNoTokenFoundState()
         }
+    }
+
+    private fun renderNoTokenFoundState() {
+        binding.loadingIndicator.root.remove()
+        binding.infoLabel.show()
+        binding.infoLabel.text = "No token found"
+
+        tokenListAdapter = TokenListAdapter(ArrayList(emptyList<ERC20Token>()))
+        binding.tokenList.adapter = tokenListAdapter
     }
 
     private fun renderErrorState(viewState: TokensViewState.ErrorState) {
@@ -90,7 +101,7 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
 //        binding.cattleHeaderSearchText.clearFocus()
 //        binding.focusableItem.requestFocus()
         return binding.tokenSearchBox
-            .textChanges().debounce(500, TimeUnit.MILLISECONDS)
+            .textChanges().debounce(800, TimeUnit.MILLISECONDS)
             .map { it.toString() }
     }
 

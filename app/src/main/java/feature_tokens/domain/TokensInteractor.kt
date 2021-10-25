@@ -3,6 +3,7 @@ package feature_tokens.domain
 import android.content.Context
 import com.example.cryptobalances.R
 import com.example.cryptobalances.core.network.NetworkService
+import com.example.cryptobalances.core.network.response.ERC20TokenResponse
 import com.example.cryptobalances.core.utils.ConstData
 import feature_tokens.view.TokensViewState
 import io.reactivex.Observable
@@ -61,6 +62,11 @@ class TokensInteractor(private val networkService: NetworkService, private val c
             return Observable.just(TokensViewState.InitialState())
         }
         val matchedTokenNames = getMatchedTokenNames(searchStr)
+
+        if (matchedTokenNames.isEmpty()) {
+            return Observable.just(TokensViewState.NoTokenFoundState())
+        }
+
         val singles = mutableListOf<Single<ERC20Token>>()
         matchedTokenNames.forEach { tokenName->
             singles.add(getTokenByName(tokenName))
@@ -91,8 +97,8 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         )
 //            .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .map {
-                ERC20Token(name = tokenName, balance = it.result!!.toDouble())
+            .map { tokenResponse: ERC20TokenResponse ->
+                ERC20Token(name = tokenName, balance = tokenResponse.result!!.toDouble())
             }
 //            .subscribe { token: ERC20TokenResponse?, error: Throwable? ->
 //                if (error == null) {
