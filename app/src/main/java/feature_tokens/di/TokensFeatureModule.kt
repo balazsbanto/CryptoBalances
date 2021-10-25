@@ -5,6 +5,6 @@ import feature_tokens.view.TokensPresenter
 import org.koin.dsl.module
 
 val tokensFeatureModule = module {
-    factory { TokensInteractor() }
+    factory { TokensInteractor(get()) }
     factory { TokensPresenter(get()) }
 }

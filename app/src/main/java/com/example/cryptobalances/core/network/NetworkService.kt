@@ -5,7 +5,7 @@ import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface DataService {
+interface NetworkService {
 
     @GET("api")
     fun getERC20Tokens(@Query("module") module: String?,
