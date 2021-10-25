@@ -1,14 +1,44 @@
 package feature_tokens.domain
 
+import android.util.Log
+import com.example.cryptobalances.core.response.ERC20Token
+import com.example.cryptobalances.core.utils.ConstData
 import feature_tokens.view.TokensViewState
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 
 class TokensInteractor {
-    init {
 
-    }
+    private var requestInterface: DataService = Retrofit.Builder()
+        .baseUrl(ConstData.BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .build().create(DataService::class.java)
 
-    fun initEmptyState() : Observable<TokensViewState> {
+    fun initEmptyState(): Observable<TokensViewState> {
+        requestInterface.getERC20Tokens(
+            module = ConstData.ACCOUNT,
+            action = ConstData.TOKEN_BALANCE,
+            contractaddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            address = ConstData.ETH_ACCOUNT,
+            tag = ConstData.LATEST,
+            apikey = ConstData.API_KEY
+        )
+//            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe { token: ERC20Token?, error:Throwable? ->
+                if (error == null) {
+                    Timber.d(token.toString())
+                } else {
+                    Timber.d(error.message)
+                }
+            }
 
         return Observable.just(TokensViewState.EmtpyState())
     }
