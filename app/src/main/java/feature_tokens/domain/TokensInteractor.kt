@@ -3,15 +3,13 @@ package feature_tokens.domain
 import android.content.Context
 import com.example.cryptobalances.R
 import com.example.cryptobalances.core.network.NetworkService
-import com.example.cryptobalances.core.network.response.ERC20Token
 import com.example.cryptobalances.core.utils.ConstData
 import feature_tokens.view.TokensViewState
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import org.json.JSONArray
 import org.json.JSONObject
-import timber.log.Timber
 
 class TokensInteractor(private val networkService: NetworkService, private val context: Context) {
     private val tokenNameToAddressMap: Map<String, String>
@@ -22,7 +20,7 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         availableTokenNames = tokenNameToAddressMap.keys.toList()
     }
 
-    val tokenSubject: PublishSubject<TokensViewState.MatchedToken> = PublishSubject.create()
+//    val tokenBalanceSubject: PublishSubject<TokensViewState.MatchedTokensState> = PublishSubject.create()
 
     private fun readTokenMap(): Map<String, String> {
         val jsonContent = context.resources.openRawResource(R.raw.available_tokens)
@@ -41,7 +39,7 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         return tokenNameToAddressMap
     }
 
-    fun getMatchedTokenNames(searchedToken:String) : List<String> {
+    fun getMatchedTokenNames(searchedToken: String): List<String> {
 
         val pattern = searchedToken.toRegex()
         val matchedTokenNames = mutableListOf<String>()
@@ -54,32 +52,48 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         return matchedTokenNames
     }
 
-    fun initEmptyState(): Observable<TokensViewState> {
-        return Observable.just(TokensViewState.EmtpyState())
+    fun createInitialState(): Observable<TokensViewState> {
+        return Observable.just(TokensViewState.InitialState())
     }
 
     fun searchIntent(searchStr: String): Observable<TokensViewState> {
-        val match = getMatchedTokenNames("USD")
-        return Observable.just(TokensViewState.EmtpyState())
+        val matchedTokenNames = getMatchedTokenNames("USD")
+        val singles = mutableListOf<Single<ERC20Token>>()
+        matchedTokenNames.forEach { tokenName->
+            singles.add(getTokenByName(tokenName))
+        }
+
+        return Observable.fromIterable(singles)
+            .flatMap {
+                it.observeOn(Schedulers.computation()).toObservable()
+            }
+            .toList()
+            .flatMapObservable {
+                Observable.just(TokensViewState.MatchedTokensState(it))
+            }
     }
 
-    fun getTokenByName(tokenName: String) {
-        networkService.getERC20Tokens(
+    private fun getTokenByName(tokenName: String): Single<ERC20Token> {
+        return networkService.getERC20Tokens(
             module = ConstData.ACCOUNT,
             action = ConstData.TOKEN_BALANCE,
-            contractaddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            contractaddress = tokenNameToAddressMap[tokenName],
+//            contractaddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
             address = ConstData.ETH_ACCOUNT,
             tag = ConstData.LATEST,
             apikey = ConstData.API_KEY
         )
 //            .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe { token: ERC20Token?, error: Throwable? ->
-                if (error == null) {
-                    Timber.d(token.toString())
-                } else {
-                    Timber.d(error.message)
-                }
+            .map {
+                ERC20Token(name = tokenName, balance = it.result!!.toDouble())
             }
+//            .subscribe { token: ERC20TokenResponse?, error: Throwable? ->
+//                if (error == null) {
+//                    Timber.d(token.toString())
+//                } else {
+//                    Timber.d(error.message)
+//                }
+//            }
     }
 }

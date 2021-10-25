@@ -3,7 +3,11 @@ package feature_tokens.view
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.cryptobalances.core.Navigator
+import com.example.cryptobalances.core.utils.remove
+import com.example.cryptobalances.core.utils.show
 import com.example.cryptobalances.databinding.ControllerTokensScreenBinding
 import com.hannesdorfmann.mosby3.MviController
 import com.jakewharton.rxbinding3.widget.textChanges
@@ -24,30 +28,42 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     private lateinit var binding:ControllerTokensScreenBinding
     private val getTokenByNameSubject = PublishSubject.create<String>()
 //    private val initializeSubject = PublishSubject.create<Any>()
+    private var tokenListAdapter: TokenListAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         binding = ControllerTokensScreenBinding.inflate(inflater, container, false)
+        initRecyclerView()
         return binding.root
 
+    }
+
+    private fun initRecyclerView() {
+        val layoutManager : RecyclerView.LayoutManager = LinearLayoutManager(activity!!)
+        binding.tokenList.layoutManager = layoutManager
     }
 
     override fun createPresenter(): TokensPresenter = get()
 
     override fun render(viewState: TokensViewState) {
         when (viewState) {
-            is TokensViewState.EmtpyState -> renderEmtpyState()
-            is TokensViewState.TokenList -> renderTokenList(viewState)
+            is TokensViewState.InitialState -> renderInitialState()
+            is TokensViewState.MatchedTokensState -> renderTokenList(viewState)
         }
     }
 
-    private fun renderTokenList(viewState: TokensViewState.TokenList) {
-        val l = viewState.tokenList
-        Timber.d(l.toString())
+    private fun renderTokenList(viewState: TokensViewState.MatchedTokensState) {
+        binding.initialStateLabel.remove()
+        binding.tokenList.show()
+
+        tokenListAdapter = TokenListAdapter(ArrayList(viewState.tokenList))
+        binding.tokenList.adapter = tokenListAdapter
     }
 
-    private fun renderEmtpyState() {
-        Timber.d("Rendered empty state")
-        binding.tokenSearchHint.text = "Search token"
+    private fun renderInitialState() {
+        Timber.d("Rendered initial state")
+        binding.tokenList.remove()
+        binding.initialStateLabel.show()
+        binding.initialStateLabel.text = "Search for a token"
     }
 
     override fun handleBack(): Boolean {

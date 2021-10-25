@@ -1,9 +1,9 @@
 package feature_tokens.view
 
-import com.example.cryptobalances.core.network.response.ERC20Token
+import feature_tokens.domain.ERC20Token
 
 sealed class TokensViewState {
-    class EmtpyState() : TokensViewState()
-    data class TokenList(val tokenList:List<ERC20Token>) : TokensViewState()
-    data class MatchedToken(val token:ERC20Token):TokensViewState()
+    class InitialState() : TokensViewState()
+    data class MatchedTokensState(val tokenList:List<ERC20Token>) : TokensViewState()
+//    data class MatchedToken(val tokenList: List<ERC20TokenResponse>):TokensViewState()
 }

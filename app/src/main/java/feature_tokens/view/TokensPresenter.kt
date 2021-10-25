@@ -12,7 +12,7 @@ class TokensPresenter(
     override fun bindIntents() {
         val initializeEmptyStateIntent = intent(TokensView::initializeEmptyStateIntent)
             .doOnNext { Timber.d("Intent: initializeEmptyState") }
-            .switchMap { interactor.initEmptyState() }
+            .switchMap { interactor.createInitialState() }
 
         val searchIntent = intent(TokensView::searchIntent)
             .doOnNext { Timber.d("Intent: searchIntent") }
