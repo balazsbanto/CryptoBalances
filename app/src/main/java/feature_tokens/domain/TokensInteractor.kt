@@ -41,10 +41,10 @@ class TokensInteractor(private val networkService: NetworkService, private val c
 
     fun getMatchedTokenNames(searchedToken: String): List<String> {
 
-        val pattern = searchedToken.toRegex()
+        val pattern = searchedToken.lowercase().toRegex()
         val matchedTokenNames = mutableListOf<String>()
         availableTokenNames.forEach { tokenName ->
-            if (pattern.containsMatchIn(tokenName)) {
+            if (pattern.containsMatchIn(tokenName.lowercase())) {
                 matchedTokenNames.add(tokenName)
             }
         }
@@ -57,7 +57,10 @@ class TokensInteractor(private val networkService: NetworkService, private val c
     }
 
     fun searchIntent(searchStr: String): Observable<TokensViewState> {
-        val matchedTokenNames = getMatchedTokenNames("USD")
+        if (searchStr.isBlank()) {
+            return Observable.just(TokensViewState.InitialState())
+        }
+        val matchedTokenNames = getMatchedTokenNames(searchStr)
         val singles = mutableListOf<Single<ERC20Token>>()
         matchedTokenNames.forEach { tokenName->
             singles.add(getTokenByName(tokenName))
