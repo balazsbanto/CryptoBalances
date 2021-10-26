@@ -65,9 +65,6 @@ dependencies {
     implementation "org.koin:koin-androidx-viewmodel:2.0.1"
     implementation "org.koin:koin-androidx-ext:2.0.1"
 
-    // Moshi
-//    implementation "com.squareup.moshi:moshi:1.8.0"
-//    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.8.0"
 
     // Conductor
     implementation "com.bluelinelabs:conductor:3.0.0-rc1"
@@ -75,8 +72,11 @@ dependencies {
     implementation "com.hannesdorfmann.mosby3:mvi-conductor:3.1.0"
 
     implementation 'androidx.recyclerview:recyclerview:1.2.0-beta01'
+    
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
 }

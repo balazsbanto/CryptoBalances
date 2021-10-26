@@ -33,6 +33,10 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         binding = ControllerTokensScreenBinding.inflate(inflater, container, false)
+        binding.swipeContainer.setOnRefreshListener {
+            binding.tokenSearchBox.setText(binding.tokenSearchBox.text.toString())
+            binding.swipeContainer.isRefreshing = false
+        }
         initRecyclerView()
         return binding.root
 
@@ -113,8 +117,6 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     }
 
     override fun searchIntent(): Observable<String> {
-//        binding.cattleHeaderSearchText.clearFocus()
-//        binding.focusableItem.requestFocus()
         return binding.tokenSearchBox
             .textChanges().debounce(800, TimeUnit.MILLISECONDS)
             .map { it.toString() }
