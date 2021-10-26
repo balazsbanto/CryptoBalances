@@ -23,8 +23,6 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         availableTokenNames = tokenNameToAddressMap.keys.toList()
     }
 
-//    val tokenBalanceSubject: PublishSubject<TokensViewState.MatchedTokensState> = PublishSubject.create()
-
     private fun readTokenMap(): Map<String, String> {
         val jsonContent = context.resources.openRawResource(R.raw.available_tokens)
             .bufferedReader().use { it.readText() }
