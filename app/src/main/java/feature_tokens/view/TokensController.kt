@@ -34,8 +34,10 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         binding = ControllerTokensScreenBinding.inflate(inflater, container, false)
         binding.swipeContainer.setOnRefreshListener {
-            binding.tokenSearchBox.setText(binding.tokenSearchBox.text.toString())
-            binding.swipeContainer.isRefreshing = false
+            binding.tokenSearchBox.apply {
+                setText(text.toString())
+                setSelection(text.length)
+            }
         }
         initRecyclerView()
         return binding.root
@@ -69,7 +71,7 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     }
 
     private fun renderNoTokenFoundState() {
-        binding.loadingIndicator.root.remove()
+        binding.swipeContainer.isRefreshing = false
         binding.infoLabel.show()
         binding.infoLabel.text = "No token found"
 
@@ -77,7 +79,7 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     }
 
     private fun renderErrorState(viewState: TokensViewState.ErrorState) {
-        binding.loadingIndicator.root.remove()
+        binding.swipeContainer.isRefreshing = false
         binding.infoLabel.show()
         binding.infoLabel.text = "Error: ${viewState.message}"
 
@@ -86,11 +88,11 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     }
 
     private fun renderLoadingState() {
-        binding.loadingIndicator.root.show()
+        binding.swipeContainer.isRefreshing = true
     }
 
     private fun renderTokenList(viewState: TokensViewState.MatchedTokensState) {
-        binding.loadingIndicator.root.remove()
+        binding.swipeContainer.isRefreshing = false
         binding.infoLabel.remove()
         binding.tokenList.show()
 
@@ -98,14 +100,14 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     }
 
     private fun setAdapterData(tokenList:List<ERC20Token>) {
-        tokenListAdapter = TokenListAdapter(ArrayList(tokenList))
+        tokenListAdapter = TokenListAdapter(ArrayList(tokenList.sortedBy { it.name }))
         binding.tokenList.adapter = tokenListAdapter
     }
 
     private fun renderInitialState() {
         Timber.d("Rendered initial state")
         binding.tokenList.remove()
-        binding.loadingIndicator.root.remove()
+        binding.swipeContainer.isRefreshing = false
         binding.infoLabel.show()
         binding.infoLabel.text = "Search for a token"
     }
