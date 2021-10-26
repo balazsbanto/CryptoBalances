@@ -28,7 +28,6 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
     private val navigator: Navigator by inject()
     private lateinit var binding:ControllerTokensScreenBinding
     private val getTokenByNameSubject = PublishSubject.create<String>()
-//    private val initializeSubject = PublishSubject.create<Any>()
     private var tokenListAdapter: TokenListAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
