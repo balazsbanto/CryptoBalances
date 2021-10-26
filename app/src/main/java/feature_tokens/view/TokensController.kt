@@ -60,14 +60,16 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
         binding.infoLabel.show()
         binding.infoLabel.text = "No token found"
 
-        tokenListAdapter = TokenListAdapter(ArrayList(emptyList<ERC20Token>()))
-        binding.tokenList.adapter = tokenListAdapter
+        setAdapterData(emptyList())
     }
 
     private fun renderErrorState(viewState: TokensViewState.ErrorState) {
         binding.loadingIndicator.root.remove()
         binding.infoLabel.show()
-        binding.infoLabel.text = "Unexpected error: ${viewState.message}"
+        binding.infoLabel.text = "Error: ${viewState.message}"
+
+        setAdapterData(emptyList())
+
     }
 
     private fun renderLoadingState() {
@@ -79,7 +81,11 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
         binding.infoLabel.remove()
         binding.tokenList.show()
 
-        tokenListAdapter = TokenListAdapter(ArrayList(viewState.tokenList))
+        setAdapterData(viewState.tokenList)
+    }
+
+    private fun setAdapterData(tokenList:List<ERC20Token>) {
+        tokenListAdapter = TokenListAdapter(ArrayList(tokenList))
         binding.tokenList.adapter = tokenListAdapter
     }
 

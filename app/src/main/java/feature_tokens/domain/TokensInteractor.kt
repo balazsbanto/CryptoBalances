@@ -70,9 +70,9 @@ class TokensInteractor(private val networkService: NetworkService, private val c
         }
     }
 
-    private fun getMatchedTokens(matchedTokenNames:List<String>): Observable<TokensViewState> {
-        val singles = mutableListOf<Single<ERC20Token>>()
-        matchedTokenNames.forEach { tokenName->
+    private fun getMatchedTokens(matchedTokenNames: List<String>): Observable<TokensViewState> {
+        val singles = mutableListOf<Single<Token>>()
+        matchedTokenNames.forEach { tokenName ->
             singles.add(getTokenByName(tokenName))
         }
 
@@ -83,35 +83,45 @@ class TokensInteractor(private val networkService: NetworkService, private val c
                 it.observeOn(Schedulers.computation()).toObservable()
             }
             .toList()
-            .flatMapObservable {
-                Observable.just(TokensViewState.MatchedTokensState(it) as TokensViewState)
+            .flatMapObservable { tokenList: List<Token> ->
+                var errorMessage = ""
+                for (token in tokenList) {
+                    if (token is ErrorToken) {
+                        errorMessage = token.result!!
+                        break
+                    }
+                }
+                if (errorMessage.isEmpty()) {
+                    Observable.just(TokensViewState.MatchedTokensState(tokenList.map { it as ERC20Token }) as TokensViewState)
+                } else {
+                    Observable.just(TokensViewState.ErrorState(errorMessage))
+                }
             }
             .startWith(TokensViewState.LoadingState())
             .onErrorReturn {
-                TokensViewState.ErrorState(it.message) }
+                TokensViewState.ErrorState(it.message)
+            }
     }
 
-    private fun getTokenByName(tokenName: String): Single<ERC20Token> {
+    private fun getTokenByName(tokenName: String): Single<Token> {
         return networkService.getERC20Tokens(
             module = ConstData.ACCOUNT,
             action = ConstData.TOKEN_BALANCE,
             contractaddress = tokenNameToAddressMap[tokenName],
-//            contractaddress = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
             address = ConstData.ETH_ACCOUNT,
             tag = ConstData.LATEST,
             apikey = ConstData.API_KEY
         )
-//            .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .map { tokenResponse: ERC20TokenResponse ->
-                ERC20Token(name = tokenName, balance = tokenResponse.result!!.toDouble())
+                if (tokenResponse.status?.toInt() == 1) {
+                    ERC20Token(name = tokenName, balance = tokenResponse.result!!.toDouble())
+                } else {
+                    ErrorToken(
+                        status = tokenResponse.status, message = tokenResponse.message,
+                        result = tokenResponse.result
+                    )
+                }
             }
-//            .subscribe { token: ERC20TokenResponse?, error: Throwable? ->
-//                if (error == null) {
-//                    Timber.d(token.toString())
-//                } else {
-//                    Timber.d(error.message)
-//                }
-//            }
     }
 }
