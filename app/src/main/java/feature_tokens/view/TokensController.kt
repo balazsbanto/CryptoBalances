@@ -108,7 +108,7 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
         binding.tokenList.remove()
         binding.swipeContainer.isRefreshing = false
         binding.infoLabel.show()
-        binding.infoLabel.text = "Search for a token"
+        binding.infoLabel.text = "Search for a token, swipe to refresh"
     }
 
     override fun handleBack(): Boolean {
