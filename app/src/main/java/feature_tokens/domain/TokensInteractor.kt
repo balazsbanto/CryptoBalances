@@ -11,6 +11,8 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
 import org.json.JSONObject
+import com.example.cryptobalances.core.utils.isInternetAvailable
+
 
 class TokensInteractor(private val networkService: NetworkService, private val context: Context) {
     private val tokenNameToAddressMap: Map<String, String>
@@ -58,6 +60,10 @@ class TokensInteractor(private val networkService: NetworkService, private val c
     }
 
     fun searchIntent(searchStr: String): Observable<TokensViewState> {
+        if (!isInternetOn()) {
+            return Observable.just(TokensViewState.NoInternetState())
+        }
+
         if (searchStr.isBlank()) {
             return Observable.just(TokensViewState.InitialState())
         }
@@ -76,8 +82,6 @@ class TokensInteractor(private val networkService: NetworkService, private val c
             singles.add(getTokenByName(tokenName))
         }
 
-        // Lehet hogy inkabb itt kellene az atalakitast megcsinaljam es megallaitsam ha error van?
-        // Mindenkepp meg kellene nezzem az error codot.
         return Observable.fromIterable(singles)
             .flatMap {
                 it.observeOn(Schedulers.computation()).toObservable()
@@ -123,5 +127,9 @@ class TokensInteractor(private val networkService: NetworkService, private val c
                     )
                 }
             }
+    }
+
+    private fun isInternetOn(): Boolean {
+        return context.isInternetAvailable()
     }
 }

@@ -52,7 +52,16 @@ class TokensController: MviController<TokensView, TokensPresenter>(), TokensView
             is TokensViewState.LoadingState -> renderLoadingState()
             is TokensViewState.ErrorState -> renderErrorState(viewState)
             is TokensViewState.NoTokenFoundState -> renderNoTokenFoundState()
+            is TokensViewState.NoInternetState -> renderNoInternetState()
         }
+    }
+
+    private fun renderNoInternetState() {
+        binding.loadingIndicator.root.remove()
+        binding.infoLabel.show()
+        binding.infoLabel.text = "No internet connection"
+
+        setAdapterData(emptyList())
     }
 
     private fun renderNoTokenFoundState() {
