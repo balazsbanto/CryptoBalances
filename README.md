@@ -15,3 +15,5 @@ ERC20 screen:
 for (no dollar value needed). This is the number of tokens that belong to the
 hardcoded address.
 * The balance is in green text if positive, red when zero.
+
+<img src="app_overview.gif" width="256">
